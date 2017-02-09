@@ -5,32 +5,62 @@ using System;
 
 public class GameTime : MonoBehaviour {
     Text timeText;
-    double g_time;
-    double nowTime;
-    double duration;
-    bool flg = false;
+    double g_time;      //計算開始時点の時間を保持する
+    double nowTime;     //現在時間を保持する
+    double duration;    //初期時間と現在時間の差を保持しているというのだろうか...。
 
+    Vector3 T_pos;      //タイムを表示する位置
+    Vector3 T_scl;      //タイムの表示スケール
 
-	// Use this for initialization
+    public enum g_state        //ゲーム状況を把握するためのステート
+    {
+        None,           //特にこれといって役割りはない。だれもお前を愛さない。
+        begin,          //ゲームが始まる...。
+        playing,        //プレイ中。集中して連打するが良い
+        gamefinish      //ゲーム終了。お疲れ様です。
+    }
+
+    public g_state state;
+
+//--------------------------------------------------------//スタート関数
 	void Start () {
-        timeText = GetComponentInChildren<Text>();  //UIのテキストの取得
-        g_time = DateTime.Now.Hour * 60 * 60 * 1000 + DateTime.Now.Minute * 60 * 1000 +
-            DateTime.Now.Second * 1000 + DateTime.Now.Millisecond;
+        timeText = GetComponentInChildren<Text>();  //get text component
+        T_scl = transform.localScale;               //variable receives number of "localScale"
+        T_pos = transform.localPosition;            //variable receives number of "localPosition"
+        
+        state = g_state.None;
 	}
 	
-	// Update is called once per frame
+//-------------------------------------------------------//アップデート関数
     void Update() {
-        if (flg == true)
+        if (state == g_state.begin)
+        {
+            g_time = DateTime.Now.Hour * 60 * 60 * 1000 + DateTime.Now.Minute * 60 * 1000 +
+           DateTime.Now.Second * 1000 + DateTime.Now.Millisecond;
+
+            state = g_state.playing;
+        }
+        if (state == g_state.playing)       //プレイ中は計算。タイムが加算されていく
         {
             nowTime = DateTime.Now.Hour * 60 * 60 * 1000 + DateTime.Now.Minute * 60 * 1000 +
                    DateTime.Now.Second * 1000 + DateTime.Now.Millisecond;
             duration = (nowTime - g_time) / 1000;
-            timeText.text = "Time : " + duration.ToString();
+            timeText.text = "Time : " + duration.ToString() + " sec";
         }
+        if (state == g_state.gamefinish)    //ゲームがフィニッシュしたらタイムを真ん中にドーンってなるやつ
+        {
+            T_pos.x = 60.0f; T_pos.y = -60.0f; T_pos.z = 0.0f;
+            T_scl.x = 3.0f; T_scl.y = 3.0f; T_scl.z = 0.0f;
+            transform.localScale = T_scl;
+            transform.localPosition = T_pos;
+            state = g_state.None;
+        }
+
     }
 
-    public void SetFlg(bool _flg)
+//-------------------------------------------------------//ステートを切り替えるパブリックな関数
+    public void setState(g_state _state)
     {
-        flg = _flg;
+        state = _state;
     }
 }

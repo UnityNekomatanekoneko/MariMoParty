@@ -32,7 +32,7 @@ public class Player : MonoBehaviour {
         //アニメーターをゲットだぜ
         _animator = GetComponent<Animator>();
 
-        //やったぜ！所要時間わずか1ｆで時間計測のスクリプトをゲットだ！
+        //やったぜ！所要時間わずか1ｆ未満で時間計測のスクリプトをゲットだ！
         _gametime = g_Time.GetComponent<GameTime>();
 
         //スタートタイム　時間　分　秒　をミリ秒に合わせる。
@@ -52,13 +52,15 @@ public class Player : MonoBehaviour {
                 {
                     moveSpeed += 0.03f;
                     b_state = ButtonState.r_button;
+                    _gametime.setState(GameTime.g_state.begin);     
                 }
                 if (Input.GetKeyDown(KeyCode.LeftArrow))
                 {
                     moveSpeed += 0.03f;
                     b_state = ButtonState.l_button;
+                    _gametime.setState(GameTime.g_state.begin);
                 }
-                _gametime.SetFlg(true);
+                
                 break;
             case ButtonState.r_button:
                 if (Input.GetKeyDown(KeyCode.LeftArrow))
@@ -76,7 +78,7 @@ public class Player : MonoBehaviour {
                 break;
         }
 
-        //ちょっとずつ減速していく
+        //ちょっとずつ減速していくフレンズなんだね。
         if (moveSpeed > 0.00f && count % 6 == 5)
         {
             moveSpeed -= 0.03f;
@@ -97,11 +99,11 @@ public class Player : MonoBehaviour {
                 now = DateTime.Now.Hour * 60 * 60 * 1000 + DateTime.Now.Minute * 60 * 1000 +
                 DateTime.Now.Second * 1000 + DateTime.Now.Millisecond;
                 Child.transform.SetParent(null);
-                _gametime.SetFlg(false);
+                _gametime.setState(GameTime.g_state.gamefinish);
             }
         }
 
-        //落下した後にコース上に戻ってくるように設定する
+        //落下した後にコース上に戻ってくる。きっとくる。
         if(transform.localPosition.y < -30)
         {
 			Pos.x = 1.73f;      Pos.y = 1.0f;       Pos.z = -210.0f;
@@ -110,7 +112,7 @@ public class Player : MonoBehaviour {
         }
 
 
-        //移動速度でアニメーションを遷移させる
+        //移動速度でアニメーションを遷移させる。ゆうこかわいい
         if (moveSpeed >= 0.25f)
         {
             _animator.Play("Running@loop");
@@ -123,8 +125,8 @@ public class Player : MonoBehaviour {
         {
             _animator.Play("Standing@loop");
         }
-        transform.localPosition = Pos;      //ポジションをプレイヤーに渡す
-        transform.localRotation = Rot;      //回転情報をプレイヤーに渡す
+        transform.localPosition = Pos;      //ポジションをプレイヤーに返す
+        transform.localRotation = Rot;      //回転情報をプレイヤーに返す
     }
 
     //エラー回避
